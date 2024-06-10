@@ -1,8 +1,9 @@
-<p align="center"><a href="https://anuraghazra.github.io"><img width="80%" alt="Hello, I'm Ibrahim. Flutte Developer😃" src="./assets/gh-readme-header.png" /></a></p>
+Hello, I'm Ibrahim. Flutte Developer😃
+<p align="center"><a href="https://github.com/anuraghazra/anuraghazra/assets/109023440/7222dd10-289b-4dba-b318-f493280d61cf"><img width="20%" alt="Hello, I'm Ibrahim. Flutte Developer😃" src="https://github.com/anuraghazra/anuraghazra/assets/109023440/7222dd10-289b-4dba-b318-f493280d61cf" /></a></p>
 
 <br />
 
-I'm a self-taught passionate FrontEnd developer from India 🇮🇳
+I'm a self-taught passionate flutter developer from Egypt
 
 **About me**
 
