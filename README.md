@@ -1,7 +1,5 @@
 
-<p align="center"><a href="https://github.com/anuraghazra/anuraghazra/assets/109023440/7222dd10-289b-4dba-b318-f493280d61cf"><img width="80%" alt="Hello, I'm Ibrahim. Flutte Developer😃" src="https://github.com/IbrahimIG1/IbrahimIG1/assets/109023440/02f212a1-c2dc-49d1-a141-db91cc3a097c" /></a></p>
-<br />
-
+<p align="center"><img width="50%" alt="Hello, I'm Ibrahim. Flutte Developer😃" src="https://github.com/IbrahimIG1/IbrahimIG1/assets/109023440/02e82f55-93d9-4d50-9e0c-f997491f9264" /></a></p>
 
 I'm a self-taught passionate flutter developer from Egypt
 
