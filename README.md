@@ -5,6 +5,8 @@ I'm a self-taught passionate flutter developer from Egypt
 
 **About me**
 
+- I LOVE MY JOB :technologist:❤️
+
 - 🚀 I'm currently working on exciting Flutter projects.
 
 - 💡 I'm interested in behavioral patterns and creating delightful user experiences.
