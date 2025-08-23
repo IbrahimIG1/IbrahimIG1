@@ -23,6 +23,10 @@ I'm a self-taught passionate flutter developer from Egypt
   <br />
 <br />
 
-![GitHub Stats](https://github-readme-stats.vercel.app/api?username=IbrahimIG1&theme=radical)
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=IbrahimIG1&show_icons=true&include_all_commits=true&count_private=true&theme=radical)
+
+**Private Stats → Commits:** 0 | **PRs:** 0 | **Issues:** 0
+
+
 
 
