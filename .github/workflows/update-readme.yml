@@ -32,7 +32,6 @@ jobs:
               issues(first: 100) { totalCount }
               contributionsCollection {
                 totalCommitContributions
-                restrictedContributionsCount
               }
             }
           }
@@ -44,7 +43,7 @@ jobs:
           )
           data = response.json()["data"]["viewer"]
 
-          commits = data["contributionsCollection"]["totalCommitContributions"]+ data["contributionsCollection"]["restrictedContributionsCount"]
+          commits = data["contributionsCollection"]["totalCommitContributions"]
           prs = data["pullRequests"]["totalCount"]
           issues = data["issues"]["totalCount"]
 
