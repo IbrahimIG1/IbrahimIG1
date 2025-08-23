@@ -1,9 +1,10 @@
+
 name: Update README with Private Stats
 
 on:
   schedule:
     - cron: "0 * * * *" # every hour
-  workflow_dispatch: # manual trigger
+  workflow_dispatch: # manual run
 
 jobs:
   update:
@@ -15,82 +16,65 @@ jobs:
       - name: Install Python deps
         run: pip install requests pyyaml
 
-      - name: Update README with stats
+      - name: Run Stats Script
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          python - << 'END'
-import requests, os, re, sys
-
-token = os.getenv("GH_TOKEN")
-if not token:
-    print("❌ Missing GH_TOKEN")
-    sys.exit(1)
-
-headers = {"Authorization": f"Bearer {token}"}
-
-query = """
-{
-  viewer {
-    login
-    contributionsCollection {
-      totalCommitContributions
-      restrictedContributionsCount
-      pullRequestReviewContributions {
-        totalCount
-      }
-    }
-    pullRequests(states: MERGED) {
-      totalCount
-    }
-  }
-}
-"""
-
-response = requests.post(
-    "https://api.github.com/graphql",
-    json={"query": query},
-    headers=headers,
-)
-
-print("Status:", response.status_code)
-print("Response:", response.text)
-
-if response.status_code != 200:
-    print("❌ API error")
-    sys.exit(1)
-
-json_data = response.json()
-if "errors" in json_data:
-    print("❌ GraphQL errors:", json_data["errors"])
-    sys.exit(1)
-
-data = json_data["data"]["viewer"]
-
-commits = (
-    data["contributionsCollection"]["totalCommitContributions"]
-    + data["contributionsCollection"]["restrictedContributionsCount"]
-)
-prs = data["pullRequests"]["totalCount"]
-reviews = data["contributionsCollection"]["pullRequestReviewContributions"]["totalCount"]
-
-with open("README.md", "r") as f:
-    readme = f.read()
-
-new_stats = f"""
-| 🔥 Commits | 🚀 Pull Requests | 📝 Code Reviews |
-|------------|-----------------|----------------|
-| {commits} | {prs} | {reviews} |
-"""
-
-readme = re.sub(r"\| 🔥 Commits.*", new_stats, readme, flags=re.DOTALL)
-
-with open("README.md", "w") as f:
-    f.write(readme)
-
-print("✅ Updated README")
-END
-
+          echo "Fetching private stats..."
+          cat > script.py << 'EOF'
+          import requests, os, re, sys
+          token = os.getenv("GH_TOKEN")
+          if not token:
+              print("❌ Missing GH_TOKEN")
+              sys.exit(1)
+          headers = {"Authorization": f"Bearer {token}"}
+          query = """
+          {
+            viewer {
+              login
+              contributionsCollection {
+                totalCommitContributions
+                restrictedContributionsCount
+              }
+              pullRequests(states: MERGED) {
+                totalCount
+              }
+              issues {
+                totalCount
+              }
+            }
+          }
+          """
+          response = requests.post(
+              "https://api.github.com/graphql",
+              json={"query": query},
+              headers=headers,
+          )
+          print("Status:", response.status_code)
+          print("Response:", response.text)
+          if response.status_code != 200:
+              print("❌ API error")
+              sys.exit(1)
+          json_data = response.json()
+          if "errors" in json_data:
+              print("❌ GraphQL errors:", json_data["errors"])
+              sys.exit(1)
+          data = json_data["data"]["viewer"]
+          commits = (
+              data["contributionsCollection"]["totalCommitContributions"]
+              + data["contributionsCollection"]["restrictedContributionsCount"]
+          )
+          prs = data["pullRequests"]["totalCount"]
+          issues = data["issues"]["totalCount"]
+          with open("README.md", "r") as f:
+              readme = f.read()
+          new_stats = f"**Private Stats → Commits:** {commits} | **PRs:** {prs} | **Issues:** {issues}"
+          readme = re.sub(r"\*\*Private Stats.*", new_stats, readme)
+          with open("README.md", "w") as f:
+              f.write(readme)
+          print("✅ Updated README")
+          EOF
+          python script.py
       - name: Commit and Push changes
         run: |
           git config --global user.email "actions@github.com"
