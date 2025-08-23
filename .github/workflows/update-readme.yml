@@ -30,23 +30,23 @@ jobs:
 
           headers = {"Authorization": f"Bearer {token}"}
 
-          query = """
-          {
-            viewer {
-              login
-              contributionsCollection {
-                totalCommitContributions
-                restrictedContributionsCount
-              }
-              pullRequests(states: MERGED) {
-                totalCount
-              }
-              issues {
-                totalCount
-              }
-            }
-          }
-          """
+         query = """
+{
+  viewer {
+    login
+    contributionsCollection {
+      totalCommitContributions
+      restrictedContributionsCount
+      pullRequestReviewContributions {
+        totalCount
+      }
+    }
+    pullRequests(states: MERGED) {
+      totalCount
+    }
+  }
+}
+"""
 
           response = requests.post(
               "https://api.github.com/graphql",
