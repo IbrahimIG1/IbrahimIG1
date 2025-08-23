@@ -1,0 +1,71 @@
+name: Update README with Private Stats
+
+on:
+  schedule:
+    - cron: "0 * * * *" # runs every hour
+  workflow_dispatch:    # allow manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Run Stats Script
+        run: |
+          echo "Fetching private stats..."
+          pip install requests pyyaml
+
+          cat > script.py << 'EOF'
+          import requests, os, re
+
+          token = os.getenv("GH_TOKEN")
+          headers = {"Authorization": f"token {token}"}
+
+          username = "IbrahimIG1"
+          query = """
+          {
+            viewer {
+              login
+              pullRequests(first: 100, states: MERGED) { totalCount }
+              issues(first: 100) { totalCount }
+              contributionsCollection {
+                totalCommitContributions
+              }
+            }
+          }
+          """
+          response = requests.post(
+              "https://api.github.com/graphql",
+              json={"query": query},
+              headers=headers,
+          )
+          data = response.json()["data"]["viewer"]
+
+          commits = data["contributionsCollection"]["totalCommitContributions"]
+          prs = data["pullRequests"]["totalCount"]
+          issues = data["issues"]["totalCount"]
+
+          # Read current README
+          with open("README.md", "r") as f:
+              readme = f.read()
+
+          new_stats = f"**Private Stats → Commits:** {commits} | **PRs:** {prs} | **Issues:** {issues}"
+          readme = re.sub(r"\*\*Private Stats.*", new_stats, readme)
+
+          with open("README.md", "w") as f:
+              f.write(readme)
+          EOF
+
+          python script.py
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add README.md
+          git commit -m "Update private stats"
+          git push
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
