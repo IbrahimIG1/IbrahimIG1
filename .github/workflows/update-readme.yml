@@ -3,7 +3,7 @@ name: Update README with Private Stats
 on:
   schedule:
     - cron: "0 * * * *" # every hour
-  workflow_dispatch: # manual run
+  workflow_dispatch: # manual trigger
 
 jobs:
   update:
@@ -15,12 +15,11 @@ jobs:
       - name: Install Python deps
         run: pip install requests pyyaml
 
-      - name: Run Stats Script
+      - name: Update README with stats
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          echo "Fetching private stats..."
-          cat > script.py << 'EOF'
+          python - << 'END'
 import requests, os, re, sys
 
 token = os.getenv("GH_TOKEN")
@@ -90,9 +89,7 @@ with open("README.md", "w") as f:
     f.write(readme)
 
 print("✅ Updated README")
-EOF
-
-          python script.py
+END
 
       - name: Commit and Push changes
         run: |
