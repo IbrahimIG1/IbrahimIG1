@@ -21,16 +21,16 @@ jobs:
         run: |
           echo "Fetching private stats..."
           cat > script.py << 'EOF'
-          import requests, os, re, sys
+import requests, os, re, sys
 
-          token = os.getenv("GH_TOKEN")
-          if not token:
-              print("❌ Missing GH_TOKEN")
-              sys.exit(1)
+token = os.getenv("GH_TOKEN")
+if not token:
+    print("❌ Missing GH_TOKEN")
+    sys.exit(1)
 
-          headers = {"Authorization": f"Bearer {token}"}
+headers = {"Authorization": f"Bearer {token}"}
 
-         query = """
+query = """
 {
   viewer {
     login
@@ -48,44 +48,49 @@ jobs:
 }
 """
 
-          response = requests.post(
-              "https://api.github.com/graphql",
-              json={"query": query},
-              headers=headers,
-          )
+response = requests.post(
+    "https://api.github.com/graphql",
+    json={"query": query},
+    headers=headers,
+)
 
-          print("Status:", response.status_code)
-          print("Response:", response.text)
+print("Status:", response.status_code)
+print("Response:", response.text)
 
-          if response.status_code != 200:
-              print("❌ API error")
-              sys.exit(1)
+if response.status_code != 200:
+    print("❌ API error")
+    sys.exit(1)
 
-          json_data = response.json()
-          if "errors" in json_data:
-              print("❌ GraphQL errors:", json_data["errors"])
-              sys.exit(1)
+json_data = response.json()
+if "errors" in json_data:
+    print("❌ GraphQL errors:", json_data["errors"])
+    sys.exit(1)
 
-          data = json_data["data"]["viewer"]
+data = json_data["data"]["viewer"]
 
-          commits = (
-              data["contributionsCollection"]["totalCommitContributions"]
-              + data["contributionsCollection"]["restrictedContributionsCount"]
-          )
-          prs = data["pullRequests"]["totalCount"]
-          issues = data["issues"]["totalCount"]
+commits = (
+    data["contributionsCollection"]["totalCommitContributions"]
+    + data["contributionsCollection"]["restrictedContributionsCount"]
+)
+prs = data["pullRequests"]["totalCount"]
+reviews = data["contributionsCollection"]["pullRequestReviewContributions"]["totalCount"]
 
-          with open("README.md", "r") as f:
-              readme = f.read()
+with open("README.md", "r") as f:
+    readme = f.read()
 
-          new_stats = f"**Private Stats → Commits:** {commits} | **PRs:** {prs} | **Issues:** {issues}"
-          readme = re.sub(r"\*\*Private Stats.*", new_stats, readme)
+new_stats = f"""
+| 🔥 Commits | 🚀 Pull Requests | 📝 Code Reviews |
+|------------|-----------------|----------------|
+| {commits} | {prs} | {reviews} |
+"""
 
-          with open("README.md", "w") as f:
-              f.write(readme)
+readme = re.sub(r"\| 🔥 Commits.*", new_stats, readme, flags=re.DOTALL)
 
-          print("✅ Updated README")
-          EOF
+with open("README.md", "w") as f:
+    f.write(readme)
+
+print("✅ Updated README")
+EOF
 
           python script.py
 
